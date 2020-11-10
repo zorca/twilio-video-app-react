@@ -1,3 +1,4 @@
+import backgroundBlur from './backgroundBlur';
 import { DEFAULT_VIDEO_CONSTRAINTS, SELECTED_AUDIO_INPUT_KEY, SELECTED_VIDEO_INPUT_KEY } from '../../../constants';
 import { useCallback, useState } from 'react';
 import Video, { LocalVideoTrack, LocalAudioTrack, CreateLocalTrackOptions } from 'twilio-video';
@@ -34,10 +35,15 @@ export default function useLocalTracks() {
       ...newOptions,
     };
 
-    return Video.createLocalVideoTrack(options).then(newTrack => {
-      setVideoTrack(newTrack);
-      return newTrack;
-    });
+    return Video.createLocalVideoTrack(options)
+      .then(newTrack => {
+        return backgroundBlur(newTrack.mediaStreamTrack);
+      })
+      .then(newMediaStreamTrack => {
+        const newTrack = new LocalVideoTrack(newMediaStreamTrack, { name: options.name } as any);
+        setVideoTrack(newTrack);
+        return newTrack;
+      });
   }, []);
 
   const removeLocalVideoTrack = useCallback(() => {
@@ -50,6 +56,11 @@ export default function useLocalTracks() {
   const getAudioAndVideoTracks = useCallback(() => {
     if (!hasAudio && !hasVideo) return Promise.resolve();
     if (isAcquiringLocalTracks || audioTrack || videoTrack) return Promise.resolve();
+
+    const videoOptions = {
+      ...(DEFAULT_VIDEO_CONSTRAINTS as {}),
+      name: `camera-${Date.now()}`,
+    };
 
     setIsAcquiringLocalTracks(true);
 
@@ -65,8 +76,7 @@ export default function useLocalTracks() {
 
     const localTrackConstraints = {
       video: hasVideo && {
-        ...(DEFAULT_VIDEO_CONSTRAINTS as {}),
-        name: `camera-${Date.now()}`,
+        ...videoOptions,
         ...(hasSelectedVideoDevice && { deviceId: { exact: selectedVideoDeviceId! } }),
       },
       audio: hasSelectedAudioDevice ? { deviceId: { exact: selectedAudioDeviceId! } } : hasAudio,
@@ -76,11 +86,13 @@ export default function useLocalTracks() {
       .then(tracks => {
         const videoTrack = tracks.find(track => track.kind === 'video');
         const audioTrack = tracks.find(track => track.kind === 'audio');
-        if (videoTrack) {
-          setVideoTrack(videoTrack as LocalVideoTrack);
-        }
         if (audioTrack) {
           setAudioTrack(audioTrack as LocalAudioTrack);
+        }
+        if (videoTrack) {
+          return backgroundBlur((videoTrack as LocalVideoTrack).mediaStreamTrack).then(newMediaStreamTrack => {
+            setVideoTrack(new LocalVideoTrack(newMediaStreamTrack, { name: videoOptions.name } as any));
+          });
         }
       })
       .finally(() => setIsAcquiringLocalTracks(false));

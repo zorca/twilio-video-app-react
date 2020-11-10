@@ -24,7 +24,7 @@ export default function useLocalVideoToggle() {
         removeLocalVideoTrack();
       } else {
         setIspublishing(true);
-        getLocalVideoTrack({ deviceId: { exact: previousDeviceIdRef.current } })
+        getLocalVideoTrack(/* { deviceId: { exact: previousDeviceIdRef.current } } */)
           .then((track: LocalVideoTrack) => localParticipant?.publishTrack(track, { priority: 'low' }))
           .catch(onError)
           .finally(() => setIspublishing(false));
