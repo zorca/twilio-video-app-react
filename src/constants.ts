@@ -1,6 +1,6 @@
 export const DEFAULT_VIDEO_CONSTRAINTS: MediaStreamConstraints['video'] = {
-  width: 640,
-  height: 360,
+  width: 1280,
+  height: 720,
   frameRate: 24,
 };
 

@@ -20,11 +20,10 @@ export default async function backgroundBlur(inputTrack: MediaStreamTrack): Prom
   ]);
 
   const $canvas = document.createElement('canvas');
-  const interval = Math.round(2000 / frameRate);
   const outputStream = ($canvas as any).captureStream(frameRate);
   const outputTrack = outputStream.getTracks()[0];
 
-  setTimeout(async function step() {
+  ($inputVideo as any).requestVideoFrameCallback(async function step() {
     if (inputTrack.readyState === 'ended') {
       return;
     }
@@ -32,8 +31,8 @@ export default async function backgroundBlur(inputTrack: MediaStreamTrack): Prom
       const bodySegment = await model.segmentPerson($inputVideo);
       requestAnimationFrame(() => bodyPix.drawBokehEffect($canvas, $inputVideo, bodySegment, 5, 5, false));
     }
-    setTimeout(step, interval);
-  }, interval);
+    ($inputVideo as any).requestVideoFrameCallback(step);
+  });
 
   return outputTrack;
 }
