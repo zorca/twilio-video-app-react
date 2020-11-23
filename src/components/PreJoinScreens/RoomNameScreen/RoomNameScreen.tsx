@@ -52,19 +52,19 @@ export default function RoomNameScreen({ name, roomName, setName, setRoomName, h
   return (
     <>
       <Typography variant="h5" className={classes.gutterBottom}>
-        Join a Room
+        Вход в комнату
       </Typography>
-      <Typography variant="body1">
-        {hasUsername
-          ? "Enter the name of a room you'd like to join."
-          : "Enter your name and the name of a room you'd like to join"}
-      </Typography>
+      {/*<Typography variant="body1">*/}
+      {/*  {hasUsername*/}
+      {/*    ? "Enter the name of a room you'd like to join."*/}
+      {/*    : "Enter your name and the name of a room you'd like to join"}*/}
+      {/*</Typography>*/}
       <form onSubmit={handleSubmit}>
         <div className={classes.inputContainer}>
           {!hasUsername && (
             <div className={classes.textFieldContainer}>
               <InputLabel shrink htmlFor="input-user-name">
-                Your Name
+                Ваше Имя
               </InputLabel>
               <TextField
                 id="input-user-name"
@@ -78,7 +78,7 @@ export default function RoomNameScreen({ name, roomName, setName, setRoomName, h
           )}
           <div className={classes.textFieldContainer}>
             <InputLabel shrink htmlFor="input-room-name">
-              Room Name
+              Комната
             </InputLabel>
             <TextField
               autoCapitalize="false"
@@ -99,7 +99,7 @@ export default function RoomNameScreen({ name, roomName, setName, setRoomName, h
             disabled={!name || !roomName}
             className={classes.continueButton}
           >
-            Continue
+            Войти
           </Button>
         </Grid>
       </form>
